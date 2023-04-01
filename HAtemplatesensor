@@ -1,0 +1,18 @@
+   - sensor:
+      - name: excess_solar
+        unique_id: "excess_solar"
+        state: >
+          {% set pv_power = states('sensor.pv_power') | float %}
+          {% set consumption = states('sensor.consumption_power') | float %}
+          {% set immersion = states('sensor.pow_elite_20a_power') | float %}
+          {{ pv_power - (consumption - immersion) | int(0) }}
+        availability: >
+          {{ states('sensor.pv_power') not in ['unknown','unavailable'] and states('sensor.consumption_power') not in ['unknown','unavailable'] and states('sensor.pow_elite_20a_power') not in ['unknown','unavailable']}}
+   - sensor:
+      - name: solar_controller
+        unique_id: "solar_controller"
+        state: >
+          {% set solar = states('sensor.excess_solar') | float %}
+          {{ ((solar + 30)/30) | int(0) }}
+        availability: >
+          {{ states('sensor.excess_solar') not in ['unknown','unavailable'] }}
